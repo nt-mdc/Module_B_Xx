@@ -27,23 +27,23 @@ class CompanySeeder extends Seeder
             $rowData = array_combine($header, $row);
 
             $company = DB::table('companies')->insertGetId([
-                'name' => $rowData['Company Name'],
-                'address' => $rowData['Company Address'],
-                'number' => $rowData['Company Telephone Number'],
-                'email' => $rowData['Company Email Address'],
+                'company_name' => $rowData['Company Name'],
+                'company_address' => $rowData['Company Address'],
+                'company_number' => $rowData['Company Telephone Number'],
+                'company_email' => $rowData['Company Email Address'],
                 'deactivated' => 0
             ]);
 
             DB::table('owner')->insert([
-                'name' => $rowData['Owner Name'],
-                'number' => $rowData['Owner Mobile Number'],
-                'email' => $rowData['Owner Email Address'],
+                'owner_name' => $rowData['Owner Name'],
+                'owner_number' => $rowData['Owner Mobile Number'],
+                'owner_email' => $rowData['Owner Email Address'],
                 'company_id' => $company
             ]);
             DB::table('contact')->insert([
-                'name' => $rowData['Contact Name'],
-                'number' => $rowData['Contact Mobile Number'],
-                'email' => $rowData['Contact Email Address'],
+                'contact_name' => $rowData['Contact Name'],
+                'contact_number' => $rowData['Contact Mobile Number'],
+                'contact_email' => $rowData['Contact Email Address'],
                 'company_id' => $company
             ]);
         }

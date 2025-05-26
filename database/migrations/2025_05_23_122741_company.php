@@ -13,26 +13,26 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('number');
-            $table->string('address');
+            $table->string('company_name');
+            $table->string('company_email')->unique();
+            $table->string('company_number');
+            $table->string('company_address');
             $table->boolean('deactivated');
         });
 
         Schema::create('owner', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('number');
-            $table->string('email');
+            $table->string('owner_name');
+            $table->string('owner_number');
+            $table->string('owner_email');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
         });
 
         Schema::create('contact', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('number');
-            $table->string('email');
+            $table->string('contact_name');
+            $table->string('contact_number');
+            $table->string('contact_email');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
         });
     }

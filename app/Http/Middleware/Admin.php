@@ -15,6 +15,9 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!$request->session()->get('auth')){
+            return redirect()->route('login');
+        }
         return $next($request);
     }
 }

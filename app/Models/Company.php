@@ -9,10 +9,10 @@ class Company extends Model
     public $timestamps = false;
     protected $table = 'companies';
     protected $fillable = [
-        'name',
-        'address',
-        'number',
-        'email',
+        'company_name',
+        'company_address',
+        'company_number',
+        'company_email',
         'deactivated'
     ];
 

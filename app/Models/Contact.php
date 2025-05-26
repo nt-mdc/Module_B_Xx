@@ -9,9 +9,9 @@ class Contact extends Model
     public $timestamps = false;
     protected $table = 'contact';
     protected $fillable = [
-        'name',
-        'number',
-        'email',
+        'contact_name',
+        'contact_number',
+        'contact_email',
         'company_id'
     ];
 

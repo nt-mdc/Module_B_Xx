@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
@@ -16,39 +17,32 @@ class CompanyController extends Controller
 
     public function create(Request $request)
     {
-        $data = $request->all();
+
+        $request->validate([
+            'company_email' => "required|unique:companies"
+        ]);
+
+        $companyData = $request->only(['company_name', 'company_email', 'company_address', 'company_number', 'deactivated']);
+        $ownerData = $request->only(['owner_name', 'owner_email', 'owner_number']);
+        $contactData = $request->only(['contact_name', 'contact_email', 'contact_number']);
 
         DB::beginTransaction();
 
+        
+
         try {
-            $company = Company::create([
-                'name' => $data['company_name'],
-                'email' => $data['company_email'],
-                'address' => $data['company_address'],
-                'number' => $data['company_phone'],
-                'deactivated' => 0,
-            ]);
+            $company = Company::create($companyData);
 
-            $company->owner()->create([
-                'name' => $data['owner_name'],
-                'email' => $data['owner_email'],
-                'number' => $data['owner_number'],
-                'company_id' => $company->id
-            ]);
+            $company->owner()->create($ownerData);
 
-            $company->contact()->create([
-                'name' => $data['contact_name'],
-                'email' => $data['contact_email'],
-                'number' => $data['contact_number'],
-                'company_id' => $company->id
-            ]);
+            $company->contact()->create($contactData);
 
             DB::commit();
 
             return redirect()->back();
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => $th]);
+            return redirect()->back()->withErrors(['error' => 'Falha no envio!  ' . $th]);
         }
     }
 
@@ -60,38 +54,25 @@ class CompanyController extends Controller
 
     public function update(Request $request, Company $id)
     {
-        $data = $request->all();
+        $companyData = $request->only(['company_name', 'company_email', 'company_address', 'company_number', 'deactivated']);
+        $ownerData = $request->only(['owner_name', 'owner_email', 'owner_number']);
+        $contactData = $request->only(['contact_name', 'contact_email', 'contact_number']);
 
-
-        $id->update([
-            'name' => $data['company_name'],
-            'email' => $data['company_email'],
-            'address' => $data['company_address'],
-            'number' => $data['company_phone'],
-            'deactivated' => $data['deactiv'],
-        ]);
-
-        $id->owner()->update([
-            'name' => $data['owner_name'],
-            'email' => $data['owner_email'],
-            'number' => $data['owner_number'],
-        ]);
-
-        $id->contact()->update([
-            'name' => $data['contact_name'],
-            'email' => $data['contact_email'],
-            'number' => $data['contact_number'],
-        ]);
-
-        if ($data['deactiv']) {
-            $id->products()->update(['hidden' => 1]);
+        if (count($companyData)) {
+            $id->update($companyData);
         }
 
-        if (!$data['deactiv']) {
-            $id->products()->update(['hidden' => 0]);
+        if (count($ownerData)) {
+            $id->owner()->update($ownerData);
         }
 
+        if (count($contactData)) {
+            $id->contact()->update($contactData);
+        }
 
+        if (isset($request['deactivated'])) {
+            $id->products()->update(['hidden' => $request['deactivated'] ? 1 : 0]);
+        }
         return redirect()->back();
     }
 }

@@ -51,11 +51,11 @@ class ProductController extends Controller
     //     }
     // }
 
-    // public function edit($id)
-    // {
-    //     $company = Company::where('id', $id)->with('owner', 'contact', 'products.translations', 'products.detail', 'products.weight')->first();
-    //     return view('company-edit')->with('company', $company);
-    // }
+    public function edit($gtin)
+    {
+        $product = Product::where('gtin', $gtin)->with('detail', 'translations', 'weight')->first();
+        return view('product-edit')->with('prod', $product);
+    }
 
     // public function update(Request $request, Company $id)
     // {

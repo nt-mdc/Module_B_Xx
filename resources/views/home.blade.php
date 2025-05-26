@@ -28,10 +28,10 @@
                     </div>
 
                     <div>
-                        <x-input-label for="company_phone" :value="__('company_telephone_number')" />
-                        <x-text-input id="company_phone" class="block mt-1 w-full" type="text" name="company_phone"
-                            :value="old('company_phone')" required autofocus autocomplete="username" />
-                        <x-input-error :messages="$errors->get('company_phone')" class="mt-2" />
+                        <x-input-label for="company_number" :value="__('company_telephone_number')" />
+                        <x-text-input id="company_number" class="block mt-1 w-full" type="text" name="company_number"
+                            :value="old('company_number')" required autofocus autocomplete="username" />
+                        <x-input-error :messages="$errors->get('company_number')" class="mt-2" />
                     </div>
 
                     <div>
@@ -83,7 +83,7 @@
                         <x-input-error :messages="$errors->get('contact_number')" class="mt-2" />
                     </div>
 
-
+                    <input type="hidden" name="deactivated" value="0">
 
                     <div class="flex items-center justify-end mt-4">
 
@@ -102,15 +102,28 @@
                 <h1 class="text-xl font-bold p-6">Actived</h1>
                 <div class="p-6 text-gray-900 grid grid-cols-3 gap-4">
                     @foreach ($companies as $company)
-                        @if (!$company['deactived'])
-                            <a href="{{ route('company.edit', ['id' => $company['id']]) }}" class="cursor-pointer border rounded-lg p-4">
-                                <h1 class="font-bold">{{ $company['name'] }}</h1>
+                        @if (!$company['deactivated'])
+                            <a href="{{ route('company.edit', ['id' => $company['id']]) }}"
+                                class="cursor-pointer border rounded-lg p-4">
+                                <h1 class="font-bold">{{ $company['company_name'] }}</h1>
                                 <ul>
-                                    <li>Telephone Number: {{ $company['number'] }}</li>
-                                    <li>Email: {{ $company['email'] }}</li>
-                                    <li>Address: {{ $company['address'] }}</li>
-                                    <li>Owner: {{ $company['owner']['name'] }}</li>
-                                    <li>Contact: {{ $company['contact']['name'] }}</li>
+                                    <li>Telephone Number: {{ $company['company_number'] }}</li>
+                                    <li>Email: {{ $company['company_email'] }}</li>
+                                    <li>Address: {{ $company['company_address'] }}</li>
+                                    <li>Owner: {{ $company['owner']['owner_name'] }}</li>
+                                    <li>Contact: {{ $company['contact']['contact_name'] }}</li>
+                                    <form method="POST"
+                                        action="{{ route('company.update', ['id' => $company['id']]) }}">
+                                        @csrf
+                                        <div class="flex items-center justify-end mt-4">
+
+                                            <input type="hidden" name="deactivated" value="1">
+
+                                            <x-primary-button class="ms-3">
+                                                {{ __('Deactive') }}
+                                            </x-primary-button>
+                                        </div>
+                                    </form>
                                 </ul>
                             </a>
                         @endif
@@ -121,15 +134,28 @@
                 <h1 class="text-xl font-bold p-6">Deactived</h1>
                 <div class="p-6 text-gray-900 grid grid-cols-3 gap-4">
                     @foreach ($companies as $company)
-                        @if ($company['deactived'])
-                            <a href="{{ route('company.edit', ['id' => $company['id']]) }}" class="cursor-pointer border rounded-lg p-4">
-                                <h1 class="font-bold">{{ $company['name'] }}</h1>
+                        @if ($company['deactivated'])
+                            <a href="{{ route('company.edit', ['id' => $company['id']]) }}"
+                                class="cursor-pointer border rounded-lg p-4">
+                                <h1 class="font-bold">{{ $company['company_name'] }}</h1>
                                 <ul>
-                                    <li>Telephone Number: {{ $company['number'] }}</li>
-                                    <li>Email: {{ $company['email'] }}</li>
-                                    <li>Address: {{ $company['address'] }}</li>
-                                    <li>Owner: {{ $company['owner']['name'] }}</li>
-                                    <li>Contact: {{ $company['contact']['name'] }}</li>
+                                    <li>Telephone Number: {{ $company['company_number'] }}</li>
+                                    <li>Email: {{ $company['company_email'] }}</li>
+                                    <li>Address: {{ $company['company_address'] }}</li>
+                                    <li>Owner: {{ $company['owner']['owner_name'] }}</li>
+                                    <li>Contact: {{ $company['contact']['contact_name'] }}</li>
+                                    <form method="POST"
+                                        action="{{ route('company.update', ['id' => $company['id']]) }}">
+                                        @csrf
+                                        <div class="flex items-center justify-end mt-4">
+
+                                            <input type="hidden" name="deactivated" value="0">
+
+                                            <x-primary-button class="ms-3">
+                                                {{ __('Active') }}
+                                            </x-primary-button>
+                                        </div>
+                                    </form>
                                 </ul>
                             </a>
                         @endif

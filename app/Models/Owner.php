@@ -9,9 +9,9 @@ class Owner extends Model
     public $timestamps = false;
     protected $table = 'owner';
     protected $fillable = [
-        'name',
-        'number',
-        'email',
+        'owner_name',
+        'owner_number',
+        'owner_email',
         'company_id'
     ];
 
