@@ -7,8 +7,8 @@
 
 
 
-    <div class="py-12">
-        <form method="POST" action="{{ route('company.create') }}" class="max-w-7xl mx-auto">
+    <div class="py-12 max-w-7xl mx-auto">
+        <form method="POST" action="{{ route('product.delete.image', ['gtin' => $prod['gtin']]) }}">
             @csrf
 
             <div>
@@ -18,20 +18,31 @@
                 <x-input-error :messages="$errors->get('gtin')" class="mt-2" />
             </div>
 
-            @foreach ($prod['translations'] as $trans)
-                    <div>
-                        <x-input-label for="{{$trans['language']}}_name" :value="__($trans['language'].'_name')" />
-                        <x-text-input id="{{$trans['language']}}_name" class="block mt-1 w-full" type="text" name="{{$trans['language']}}_name"
-                            :value="old($trans['language'].'_name', $trans['name'])" required autofocus autocomplete="username" />
-                        <x-input-error :messages="$errors->get($trans['language'].'_name')" class="mt-2" />
-                    </div>
+            <div>
+                <x-input-label for="company_id" :value="__('company_id')" />
+                <select name="company_id" id="company_id" class="w-full">
+                    @foreach ($comp as $c)
+                        <option value="{{$c['id']}}" @if ($c['id'] == $prod['comapny_id']) selected @endif>{{$c['company_name']}}</option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('company_id')" class="mt-2" />
+            </div>
 
-                    <div>
-                        <x-input-label for="{{$trans['language']}}_desc" :value="__($trans['language'].'_descripiton')" />
-                        <textarea id="{{$trans['language']}}_desc" class="block mt-1 w-full" type="text" name="{{$trans['language']}}_desc" required
-                            autofocus autocomplete="username" cols="30" rows="2">{{old($trans['language'].'_desc', $trans['description'])}}</textarea>
-                        <x-input-error :messages="$errors->get($trans['language'].'_desc')" class="mt-2" />
-                    </div>
+            @foreach ($prod['translations'] as $trans)
+                <div>
+                    <x-input-label for="{{ $trans['language'] }}_name" :value="__($trans['language'] . '_name')" />
+                    <x-text-input id="{{ $trans['language'] }}_name" class="block mt-1 w-full" type="text"
+                        name="translations[{{ $trans['language'] }}][name]" :value="old('translations.'.$trans['language1'].'.name', $trans['name'])" required autofocus
+                        autocomplete="username" />
+                    <x-input-error :messages="$errors->get($trans['language'] . '_name')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="{{ $trans['language'] }}_desc" :value="__($trans['language'] . '_descripton')" />
+                    <textarea id="{{ $trans['language'] }}_desc" class="block mt-1 w-full" type="text"
+                        name="translations[{{ $trans['language'] }}][description]" required autofocus autocomplete="username" cols="30" rows="2">{{ old('translations.'.$trans['language1'].'.description', $trans['description']) }}</textarea>
+                    <x-input-error :messages="$errors->get($trans['language'] . '_desc')" class="mt-2" />
+                </div>
             @endforeach
 
             <div>
@@ -86,5 +97,36 @@
                 </x-primary-button>
             </div>
         </form>
+        <form method="POST" action="">
+            @csrf
+            <div class="flex items-center justify-end mt-4">
+                <x-danger-button class="ms-3">
+                    {{ __('Remove Image') }}
+                </x-danger-button>
+            </div>
+        </form>
+
+        <form method="POST" action="{{ route('product.update', ['gtin' => $prod['gtin']]) }}">
+            @csrf
+            <div class="flex items-center justify-end mt-4">
+                <input type="hidden" name="hidden" value="{{ $prod['hidden'] ? 0 : 1 }}">
+                <x-primary-button class="ms-3">
+                    {{ $prod['hidden'] ? __('Show') : __('Hide') }}
+                </x-primary-button>
+            </div>
+        </form>
+
+        @if ($prod['hidden'])
+            <form method="POST" action="{{ route('product.delete', ['gtin' => $prod['gtin']]) }}">
+                @csrf
+                <div class="flex items-center justify-end mt-4">
+                    <x-danger-button class="ms-3">
+                        {{ __('Delete Product permanently') }}
+                    </x-danger-button>
+                </div>
+            </form>
+        @endif
+
+
     </div>
 </x-app-layout>

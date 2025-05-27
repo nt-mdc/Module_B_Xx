@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -54,47 +55,65 @@ class ProductController extends Controller
     public function edit($gtin)
     {
         $product = Product::where('gtin', $gtin)->with('detail', 'translations', 'weight')->first();
-        return view('product-edit')->with('prod', $product);
+        $companies = Company::all();
+        return view('product-edit')->with([
+            'prod' => $product,
+            'comp' => $companies
+        ]);
     }
 
-    // public function update(Request $request, Company $id)
-    // {
-    //     $data = $request->all();
+    public function updateCreate(Request $request, Product $gtin = null)
+    {
+        $request->validate([
+            'gtin' => 'required|unique:products,gtin',
+            'company_id' => 'required|exists:companies,id'
+        ]);
+
+        $product = Product::updateOrCreate(
+            ['gtin' => $request->gtin],
+            $request->only('gtin', 'hidden', 'company_id')
+        );
+
+        $product->detail()->updateOrCreate([], $request->only('brand', 'country'));
+        $product->weight()->updateOrCreate([], $request->only('unit', 'net', 'gross'));
+
+        $productData = $request->only('gtin', 'hidden', 'company_id');
+        $detailData = $request->only('brand', 'country');
+        $weightData = $request->only('unit', 'net', 'gross');
 
 
-    //     $id->update([
-    //         'name' => $data['company_name'],
-    //         'email' => $data['company_email'],
-    //         'address' => $data['company_address'],
-    //         'number' => $data['company_phone'],
-    //         'deactivated' => $data['deactiv'],
-    //     ]);
 
-    //     $id->owner()->update([
-    //         'name' => $data['owner_name'],
-    //         'email' => $data['owner_email'],
-    //         'number' => $data['owner_number'],
-    //     ]);
+        $id->update([
+            'name' => $data['company_name'],
+            'email' => $data['company_email'],
+            'address' => $data['company_address'],
+            'number' => $data['company_phone'],
+            'deactivated' => $data['deactiv'],
+        ]);
 
-    //     $id->contact()->update([
-    //         'name' => $data['contact_name'],
-    //         'email' => $data['contact_email'],
-    //         'number' => $data['contact_number'],
-    //     ]);
+        $id->owner()->update([
+            'name' => $data['owner_name'],
+            'email' => $data['owner_email'],
+            'number' => $data['owner_number'],
+        ]);
 
-    //     if ($data['deactiv']) {
-    //         $id->products()->update(['hidden' => 1]);
-    //     }
+        $id->contact()->update([
+            'name' => $data['contact_name'],
+            'email' => $data['contact_email'],
+            'number' => $data['contact_number'],
+        ]);
 
-    //     if (!$data['deactiv']) {
-    //         $id->products()->update(['hidden' => 0]);
-    //     }
+        if ($data['deactiv']) {
+            $id->products()->update(['hidden' => 1]);
+        }
+
+        if (!$data['deactiv']) {
+            $id->products()->update(['hidden' => 0]);
+        }
 
 
-    //     return redirect()->back();
-    // }
-
-    public function apiGet() {
-        
+        return redirect()->back();
     }
+
+    public function apiGet() {}
 }

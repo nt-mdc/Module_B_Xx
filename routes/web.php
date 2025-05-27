@@ -15,6 +15,9 @@ Route::middleware(Admin::class)->group(function () {
 
     Route::get('products', [ProductController::class, 'index'])->name('products');
     Route::get('/products/{gtin}', [ProductController::class, 'edit'])->name('product.edit');
+    Route::post('/products/{gtin}', [ProductController::class, 'update'])->name('product.update');
+    Route::post('/products/{gtin}/delete', [ProductController::class, 'delete'])->name('product.delete');
+    Route::post('/products/{gtin}/image', [ProductController::class, 'deleteImage'])->name('product.delete.image');
 
     Route::post('/create', [CompanyController::class, 'create'])->name('company.create');
     Route::get('/{id}', [CompanyController::class, 'edit'])->name('company.edit');
