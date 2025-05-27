@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('GTIN: ' . $prod['gtin']) }}
+            {{ __('GTIN: ' . $prod['gtin']) }} {{ $prod['hidden'] }}
         </h2>
     </x-slot>
 
 
 
     <div class="py-12 max-w-7xl mx-auto">
-        <form method="POST" action="{{ route('product.delete.image', ['gtin' => $prod['gtin']]) }}">
+        <form method="POST" action="{{ route('product.update.create', ['gtin' => $prod['gtin']]) }}">
             @csrf
 
             <div>
@@ -22,7 +22,8 @@
                 <x-input-label for="company_id" :value="__('company_id')" />
                 <select name="company_id" id="company_id" class="w-full">
                     @foreach ($comp as $c)
-                        <option value="{{$c['id']}}" @if ($c['id'] == $prod['comapny_id']) selected @endif>{{$c['company_name']}}</option>
+                        <option value="{{ $c['id'] }}" @if ($c['id'] == $prod['comapny_id']) selected @endif>
+                            {{ $c['company_name'] }}</option>
                     @endforeach
                 </select>
                 <x-input-error :messages="$errors->get('company_id')" class="mt-2" />
@@ -32,7 +33,7 @@
                 <div>
                     <x-input-label for="{{ $trans['language'] }}_name" :value="__($trans['language'] . '_name')" />
                     <x-text-input id="{{ $trans['language'] }}_name" class="block mt-1 w-full" type="text"
-                        name="translations[{{ $trans['language'] }}][name]" :value="old('translations.'.$trans['language1'].'.name', $trans['name'])" required autofocus
+                        name="translations[{{ $trans['language'] }}][name]" :value="old('translations.' . $trans['language'] . '.name', $trans['name'])" required autofocus
                         autocomplete="username" />
                     <x-input-error :messages="$errors->get($trans['language'] . '_name')" class="mt-2" />
                 </div>
@@ -40,7 +41,8 @@
                 <div>
                     <x-input-label for="{{ $trans['language'] }}_desc" :value="__($trans['language'] . '_descripton')" />
                     <textarea id="{{ $trans['language'] }}_desc" class="block mt-1 w-full" type="text"
-                        name="translations[{{ $trans['language'] }}][description]" required autofocus autocomplete="username" cols="30" rows="2">{{ old('translations.'.$trans['language1'].'.description', $trans['description']) }}</textarea>
+                        name="translations[{{ $trans['language'] }}][description]" required autofocus autocomplete="username"
+                        cols="30" rows="2">{{ old('translations.' . $trans['language'] . '.description', $trans['description']) }}</textarea>
                     <x-input-error :messages="$errors->get($trans['language'] . '_desc')" class="mt-2" />
                 </div>
             @endforeach
@@ -97,7 +99,7 @@
                 </x-primary-button>
             </div>
         </form>
-        <form method="POST" action="">
+        <form method="POST" action="{{route('product.delete.image')}}">
             @csrf
             <div class="flex items-center justify-end mt-4">
                 <x-danger-button class="ms-3">
@@ -106,7 +108,7 @@
             </div>
         </form>
 
-        <form method="POST" action="{{ route('product.update', ['gtin' => $prod['gtin']]) }}">
+        <form method="POST" action="{{ route('product.update.create', ['gtin' => $prod['gtin']]) }}">
             @csrf
             <div class="flex items-center justify-end mt-4">
                 <input type="hidden" name="hidden" value="{{ $prod['hidden'] ? 0 : 1 }}">

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Monolog\Handler\IFTTTHandler;
 
 class ProductController extends Controller
 {
@@ -14,43 +16,11 @@ class ProductController extends Controller
         return view('products')->with('products', $products);
     }
 
-    // public function create(Request $request)
-    // {
-    //     $data = $request->all();
-
-    //     DB::beginTransaction();
-
-    //     try {
-    //         $company = Company::create([
-    //             'name' => $data['company_name'],
-    //             'email' => $data['company_email'],
-    //             'address' => $data['company_address'],
-    //             'number' => $data['company_phone'],
-    //             'deactivated' => 0,
-    //         ]);
-
-    //         $company->owner()->create([
-    //             'name' => $data['owner_name'],
-    //             'email' => $data['owner_email'],
-    //             'number' => $data['owner_number'],
-    //             'company_id' => $company->id
-    //         ]);
-
-    //         $company->contact()->create([
-    //             'name' => $data['contact_name'],
-    //             'email' => $data['contact_email'],
-    //             'number' => $data['contact_number'],
-    //             'company_id' => $company->id
-    //         ]);
-
-    //         DB::commit();
-
-    //         return redirect()->back();
-    //     } catch (\Throwable $th) {
-    //         DB::rollBack();
-    //         return response()->json(['error' => $th]);
-    //     }
-    // }
+    public function new()
+    {
+        $comp = Company::all();
+        return view('products-create')->with('comp', $comp);
+    }
 
     public function edit($gtin)
     {
@@ -64,10 +34,15 @@ class ProductController extends Controller
 
     public function updateCreate(Request $request, Product $gtin = null)
     {
+        $productGtin = $gtin?->gtin;
+
         $request->validate([
-            'gtin' => 'required|unique:products,gtin',
-            'company_id' => 'required|exists:companies,id'
+            'gtin' => ['required', 'string', 'min:13', 'max:14',Rule::unique('products', 'gtin')->ignore($productGtin)],
+            'company_id' => 'required|exists:companies,id',
+            'image_path' => 'image'
         ]);
+
+        $image = $request->file('image');
 
         $product = Product::updateOrCreate(
             ['gtin' => $request->gtin],
@@ -77,40 +52,40 @@ class ProductController extends Controller
         $product->detail()->updateOrCreate([], $request->only('brand', 'country'));
         $product->weight()->updateOrCreate([], $request->only('unit', 'net', 'gross'));
 
-        $productData = $request->only('gtin', 'hidden', 'company_id');
-        $detailData = $request->only('brand', 'country');
-        $weightData = $request->only('unit', 'net', 'gross');
-
-
-
-        $id->update([
-            'name' => $data['company_name'],
-            'email' => $data['company_email'],
-            'address' => $data['company_address'],
-            'number' => $data['company_phone'],
-            'deactivated' => $data['deactiv'],
-        ]);
-
-        $id->owner()->update([
-            'name' => $data['owner_name'],
-            'email' => $data['owner_email'],
-            'number' => $data['owner_number'],
-        ]);
-
-        $id->contact()->update([
-            'name' => $data['contact_name'],
-            'email' => $data['contact_email'],
-            'number' => $data['contact_number'],
-        ]);
-
-        if ($data['deactiv']) {
-            $id->products()->update(['hidden' => 1]);
+        foreach ($request->input('translations', []) as $lang => $data) {
+            $product->translations()->updateOrCreate([
+                'language' => $lang
+            ], [
+                'name' => $data['name'],
+                'description' => $data['description']
+            ]);
         }
 
-        if (!$data['deactiv']) {
-            $id->products()->update(['hidden' => 0]);
+        if ($image) {
+            $path = $image->store('images', 'public');
+            $product->image()->updateOrCreate([], [
+                'image_path' => $path
+            ]);
         }
 
+        $product['hidden'] = $request->hidden ? 1 : 0;
+
+        return redirect()->back();
+    }
+
+    public function delete(Product $gtin) {
+        if ($gtin['hidden']) {
+            $gtin->delete();
+            return redirect()->route('products');
+        }
+
+        return redirect()->back();
+    }
+
+    public function deleteImage(Product $gtin) {
+        $gtin->image()->update([
+            'image_path' => null
+        ]);
 
         return redirect()->back();
     }
