@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->unsignedBigInteger('gtin')->primary();
+            $table->string('gtin')->primary();
             $table->boolean('hidden');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
         });

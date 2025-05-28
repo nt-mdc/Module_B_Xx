@@ -10,7 +10,7 @@
     <div class="py-12 max-w-7xl mx-auto">
         <form method="POST" action="{{ route('product.update.create') }}">
             @csrf
-
+            <input type="hidden" name="hidden" value="0">
             <div>
                 <x-input-label for="gtin" :value="__('gtin')" />
                 <x-text-input id="gtin" class="block mt-1 w-full" type="text" name="gtin" :value="old('gtin')"
@@ -19,7 +19,7 @@
             </div>
 
             <div>
-                <x-input-label for="company_id" :value="__('company_id')" />
+                <x-input-label for="company_id" :value="__('company')" />
                 <select name="company_id" id="company_id" class="w-full">
                     @foreach ($comp as $c)
                         <option value="{{ $c['id'] }}" @if (old('company_id') == $c['id']) selected @endif>
@@ -63,35 +63,35 @@
 
             <div>
                 <x-input-label for="brand" :value="__('brand')" />
-                <x-text-input id="brand" class="block mt-1 w-full" type="text" name="brand" :value="old('brand', $prod['detail']['brand'])"
+                <x-text-input id="brand" class="block mt-1 w-full" type="text" name="brand" :value="old('brand')"
                     required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('brand')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="country" :value="__('country')" />
-                <x-text-input id="country" class="block mt-1 w-full" type="text" name="country" :value="old('country', $prod['detail']['country'])"
+                <x-text-input id="country" class="block mt-1 w-full" type="text" name="country" :value="old('country')"
                     required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('country')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="unit" :value="__('weight_unit')" />
-                <x-text-input id="unit" class="block mt-1 w-full" type="text" name="unit" :value="old('unit', $prod['weight']['unit'])"
+                <x-text-input id="unit" class="block mt-1 w-full" type="text" name="unit" :value="old('unit')"
                     required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('unit')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="net" :value="__('weight_net_content')" />
-                <x-text-input id="net" class="block mt-1 w-full" type="text" name="net" :value="old('net', $prod['weight']['net'])"
+                <x-text-input id="net" class="block mt-1 w-full" type="text" name="net" :value="old('net')"
                     required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('net')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="gross" :value="__('weight_gross(with_packing)')" />
-                <x-text-input id="gross" class="block mt-1 w-full" type="text" name="gross" :value="old('gross', $prod['weight']['gross'])"
+                <x-text-input id="gross" class="block mt-1 w-full" type="text" name="gross" :value="old('gross')"
                     required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('gross')" class="mt-2" />
             </div>
@@ -102,8 +102,6 @@
                     name="image_path" :value="old('image_path')" autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('image_path')" class="mt-2" />
             </div>
-
-            <input type="hidden" name="deactivated" value="0">
 
             <div class="flex items-center justify-end mt-4">
 

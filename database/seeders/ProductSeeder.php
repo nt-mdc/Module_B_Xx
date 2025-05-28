@@ -63,7 +63,8 @@ class ProductSeeder extends Seeder
             ]);
 
             DB::table('product_image')->insert([
-                'product_gtin' => $rowData['GTIN']
+                'product_gtin' => $rowData['GTIN'],
+                'image_path' => 'placeholder.jpg'
             ]);
 
             $compAct = ($compAct % $companiesTot) + 1;

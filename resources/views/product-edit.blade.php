@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('GTIN: ' . $prod['gtin']) }} {{ $prod['hidden'] }}
+            {{ __('GTIN: ' . $prod['gtin']) }} - {{ $prod['hidden'] ? __("Deactivated") : __("Activated") }}
         </h2>
     </x-slot>
 
 
 
     <div class="py-12 max-w-7xl mx-auto">
-        <form method="POST" action="{{ route('product.update.create', ['gtin' => $prod['gtin']]) }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ route('product.update.create', ['gtin' => $prod['gtin']]) }}">
             @csrf
 
             <div>
@@ -84,12 +84,11 @@
 
             <div>
                 <x-input-label for="image_path" :value="__('image')" />
+                <img class="max-w-xl" src="{{asset('storage/'.$prod['image']['image_path'])}}" alt="">
                 <x-text-input id="image_path" class="block mt-1 w-full" type="file" accept="image/*"
-                    name="image_path" :value="old('image_path')" required autofocus autocomplete="username" />
+                    name="image_path" :value="old('image_path')" autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('image_path')" class="mt-2" />
             </div>
-
-            <input type="hidden" name="deactivated" value="0">
 
             <div class="flex items-center justify-end mt-4">
 
@@ -99,7 +98,7 @@
                 </x-primary-button>
             </div>
         </form>
-        <form method="POST" action="{{route('product.delete.image')}}">
+        <form method="POST" action="{{route('product.delete.image', ['gtin' => $prod['gtin']])}}">
             @csrf
             <div class="flex items-center justify-end mt-4">
                 <x-danger-button class="ms-3">
@@ -108,7 +107,7 @@
             </div>
         </form>
 
-        <form method="POST" action="{{ route('product.update.create', ['gtin' => $prod['gtin']]) }}">
+        <form method="POST" action="{{ route('product.toggle', ['gtin' => $prod['gtin']]) }}">
             @csrf
             <div class="flex items-center justify-end mt-4">
                 <input type="hidden" name="hidden" value="{{ $prod['hidden'] ? 0 : 1 }}">

@@ -9,6 +9,7 @@ class Product extends Model
     public $timestamps = false;
     protected $table = 'products';
     protected $primaryKey = 'gtin';
+    public $incrementing = false;
     protected $fillable = [
         'gtin',
         'hidden',
